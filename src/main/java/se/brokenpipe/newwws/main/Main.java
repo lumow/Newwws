@@ -51,7 +51,7 @@ public class Main {
         try {
             database.setup();
         } catch (DatabaseException e) {
-            exitWithMessage(e.getMessage());
+            exitWithMessage("Couldn't set up database");
         }
         ResourceEngine engine = new ResourceEngine(settingsProvider.getResourceSettings(), Executors.newCachedThreadPool());
         Thread engineThread = new Thread(engine);

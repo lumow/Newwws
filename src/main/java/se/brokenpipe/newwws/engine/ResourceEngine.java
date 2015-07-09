@@ -4,21 +4,24 @@ import se.brokenpipe.newwws.resource.Resource;
 import se.brokenpipe.newwws.settings.ResourceSettings;
 
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
+import java.util.logging.Logger;
 
 /**
  * Author: Jacob Arnesson
  * Email:  jacob.arnesson@infor.com
  * Date:   2015-07-01
  */
-public class ResourceEngine implements Runnable {
+public class ResourceEngine implements Runnable, Stoppable {
 
     private final ResourceSettings resourceSettings;
     private final ExecutorService executorService;
-    private final Map<String, Stoppable> currentResources = new HashMap<>();
+    private volatile boolean keepRunning = true;
+    private final long sleepTime = 1000L;
+    private final Map<String, Long> lastUpdateMap = new HashMap<>();
+    private static final Logger LOGGER = Logger.getLogger(ResourceEngine.class.getName());
 
     public ResourceEngine(final ResourceSettings resourceSettings, final ExecutorService executorService) {
         this.resourceSettings = resourceSettings;
@@ -27,34 +30,43 @@ public class ResourceEngine implements Runnable {
 
     @Override
     public void run() {
-        while (true) {
+        while (keepRunning) {
             List<Resource> resources = resourceSettings.getAllResources();
-            cleanUpResourceSet(resources);
             for (Resource resource : resources) {
-                if (!currentResources.containsKey(resource.getUrl())) {
-                    GenericResourceJob job = new GenericResourceJob(resource);
-                    currentResources.put(resource.getUrl(), job);
-                    executorService.submit(job);
+                long lastUpdate;
+                if (lastUpdateMap.containsKey(resource.getUrl())) {
+                    lastUpdate = lastUpdateMap.get(resource.getUrl());
+                } else {
+                    long currentTime = System.currentTimeMillis();
+                    lastUpdateMap.put(resource.getUrl(), currentTime);
+                    lastUpdate = 0;
                 }
+                if (timeToUpdate(resource, lastUpdate)) {
+                    GenericResourceJob job = new GenericResourceJob(resource);
+                    executorService.submit(job);
+                    setUpdateTime(resource, System.currentTimeMillis());
+                }
+            }
+            try {
+                Thread.sleep(sleepTime);
+            } catch (InterruptedException e) {
+                LOGGER.warning("Resource engine thread was interrupted: " + e.getMessage());
             }
         }
     }
 
-    private void cleanUpResourceSet(List<Resource> allResources) {
-        Iterator<String> iterator = currentResources.keySet().iterator();
+    private boolean timeToUpdate(final Resource resource, long lastUpdate) {
+        long currentTime = System.currentTimeMillis();
+        long updateInterval = resource.getTimer();
+        return currentTime > lastUpdate + updateInterval;
+    }
 
-        while (iterator.hasNext()) {
-            String resourceUrl = iterator.next();
-            boolean found = false;
-            for (Resource resource : allResources) {
-                if (resource.getUrl().equals(resourceUrl)) {
-                    found = true;
-                }
-            }
-            if (!found) {
-                currentResources.get(resourceUrl).stop();
-                iterator.remove();
-            }
-        }
+    private void setUpdateTime(final Resource resource, final long time) {
+        lastUpdateMap.put(resource.getUrl(), time);
+    }
+
+    @Override
+    public void stop() {
+        keepRunning = false;
     }
 }

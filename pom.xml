@@ -31,6 +31,11 @@
             <version>4.0</version>
         </dependency>
         <dependency>
+            <groupId>org.hibernate</groupId>
+            <artifactId>hibernate-core</artifactId>
+            <version>4.3.10.Final</version>
+        </dependency>
+        <dependency>
             <groupId>org.testng</groupId>
             <artifactId>testng</artifactId>
             <version>6.8.8</version>
@@ -82,14 +87,15 @@
     </build>
 
     <scm>
-        <url>https://github.com/lumow/.git</url>
-        <connection>scm:git:git://github.com/lumow/.git</connection>
-        <developerConnection>scm:git:git@github.com:lumow/.git</developerConnection>
+        <url>https://github.com/lumow/Newwws.git</url>
+        <connection>scm:git:git://github.com/lumow/Newwws.git</connection>
+        <developerConnection>scm:git:git@github.com:lumow/Newwws.git</developerConnection>
     </scm>
 
     <licenses>
         <license>
-            <name></name>
+            <name>Simplified BSD License (2-clause)</name>
+            <url></url>
         </license>
     </licenses>
 
@@ -98,6 +104,11 @@
             <name>Jacob Arnesson</name>
             <email>jacob.arnesson@brokenpipe.se</email>
             <url>www.brokenpipe.se</url>
+            <roles>
+                <role>architect</role>
+                <role>developer</role>
+            </roles>
+            <timezone>Europe/Stockholm</timezone>
         </developer>
     </developers>
 </project>

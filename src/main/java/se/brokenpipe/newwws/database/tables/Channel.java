@@ -1,4 +1,6 @@
-package se.brokenpipe.newwws.resource.parser.rss;
+package se.brokenpipe.newwws.database.tables;
+
+import se.brokenpipe.newwws.resource.parser.rss.RSSTag;
 
 /**
  * Author: Jacob Arnesson
@@ -14,6 +16,9 @@ public class Channel implements RSSTag {
     public static final String LINK_IDENTIFIER = "link";
     private String description;
     public static final String DESCRIPTION_IDENTIFIER = "description";
+
+    public Channel() {
+    }
 
     public String getTitle() {
         return title;

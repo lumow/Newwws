@@ -1,11 +1,13 @@
 package se.brokenpipe.newwws.database;
 
-import se.brokenpipe.newwws.resource.parser.rss.Channel;
-import se.brokenpipe.newwws.resource.parser.rss.Item;
+import org.hibernate.HibernateException;
+import org.hibernate.Session;
+import org.hibernate.SessionFactory;
+import org.hibernate.cfg.Configuration;
+import se.brokenpipe.newwws.database.tables.Item;
 
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.SQLException;
+import java.util.List;
+import java.util.logging.Logger;
 
 /**
  * Author: Jacob Arnesson
@@ -14,48 +16,44 @@ import java.sql.SQLException;
  */
 public class Database {
 
+    private final static Logger LOGGER = Logger.getLogger(Database.class.getName());
     private final DatabaseSettings settings;
-    private Connection connection;
+    private static SessionFactory sessionFactory;
 
     public Database(final DatabaseSettings settings) {
         this.settings = settings;
     }
 
-    /**
-     * Tries to setup the database for the settings provided.
-     */
-    public void setup() throws DatabaseException {
-        DatabaseType dbType = settings.getDatabaseType();
+    public static void setup() throws DatabaseException {
         try {
-            Class.forName(dbType.getDatabaseDriver());
-        } catch (ClassNotFoundException ex) {
-            throw new DatabaseException("Could not find class " + dbType.getDatabaseDriver(), ex);
+            sessionFactory = new Configuration().configure().buildSessionFactory();
+        } catch (HibernateException ex) {
+            throw new DatabaseException("Error when setting up database", ex);
         }
     }
 
-    public void insertChannel(final Channel channel) {
-
-    }
-
-    public void insertItem(final Item item) {
-
-    }
-
-    private Connection getConnection() throws DatabaseException {
+    public static List<Item> getAllItems() throws DatabaseException {
         try {
-            connection = DriverManager.getConnection(settings.getDatabaseType().getJdbcPrefix() + settings.getHost(), settings.getUsername(), settings.getPassword());
-        } catch (SQLException e) {
-            throw new DatabaseException("Could not connect to '" + settings.getDatabaseType().getJdbcPrefix() + settings.getHost() + "'", e);
+            Session session = sessionFactory.openSession();
+            session.beginTransaction();
+            List<Item> list = (List<Item>) session.createQuery("from Item").list();
+            session.getTransaction().commit();
+            session.close();
+            return list;
+        } catch (HibernateException ex) {
+            throw new DatabaseException("Error when getting all items from database", ex);
         }
-        return connection;
     }
 
-    private void closeConnection() throws DatabaseException {
+    public static void insertItem(final Item item) throws DatabaseException {
         try {
-            // TODO: commit/rollback?
-            connection.close();
-        } catch (SQLException e) {
-            throw new DatabaseException("Could not close database", e);
+            Session session = sessionFactory.openSession();
+            session.beginTransaction();
+            session.save(item);
+            session.getTransaction().commit();
+            session.close();
+        } catch (HibernateException ex) {
+            throw new DatabaseException("Error when inserting new item in database: " + item.toString(), ex);
         }
     }
 }

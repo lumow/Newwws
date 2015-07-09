@@ -1,5 +1,9 @@
 package se.brokenpipe.newwws.resource.parser.rss;
 
+import se.brokenpipe.newwws.database.Database;
+import se.brokenpipe.newwws.database.DatabaseException;
+import se.brokenpipe.newwws.database.tables.Channel;
+import se.brokenpipe.newwws.database.tables.Item;
 import se.brokenpipe.newwws.resource.ResourceParser;
 import se.brokenpipe.newwws.resource.parser.ParseException;
 
@@ -19,7 +23,12 @@ import java.util.logging.Logger;
  */
 public class RssParser implements ResourceParser {
 
+    private final String resource;
     private final Logger LOGGER = Logger.getLogger(RssParser.class.getName());
+
+    public RssParser(final String resource) {
+        this.resource = resource;
+    }
 
     @Override
     public void parse(InputStream is) throws ParseException {
@@ -34,11 +43,14 @@ public class RssParser implements ResourceParser {
                     switch (event.asStartElement().getName().getLocalPart()) {
                         case Channel.IDENTIFIER:
                             Channel channel = processChannel(eventReader);
-                            LOGGER.info("Parsed a channel tag: " + channel.toString());
                             break;
                         case Item.IDENTIFIER:
                             Item item = processItem(eventReader);
-                            LOGGER.info("Parsed an item tag: " + item.toString());
+                            try {
+                                Database.insertItem(item);
+                            } catch (DatabaseException ex) {
+                                LOGGER.severe("Could not insert item [" + item.toString() + "] cause: " + ex.getMessage());
+                            }
                             break;
                         default:
                             // Unsupported tag
@@ -49,7 +61,7 @@ public class RssParser implements ResourceParser {
         } catch (XMLStreamException e) {
             throw new ParseException("Failed to parse document", e);
         }
-        LOGGER.info("Parsing of resource done");
+        LOGGER.info("Parsing of resource [" + resource + "] done");
     }
 
     /*

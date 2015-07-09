@@ -1,12 +1,22 @@
-package se.brokenpipe.newwws.resource.parser.rss;
+package se.brokenpipe.newwws.database.tables;
+
+import org.hibernate.annotations.GenericGenerator;
+import se.brokenpipe.newwws.resource.parser.rss.RSSTag;
+
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
 
 /**
  * Author: Jacob Arnesson
  * Email:  jacob.arnesson@infor.com
  * Date:   2015-07-01
  */
+@Entity
 public class Item implements RSSTag {
 
+    private Long id;
     public static final String IDENTIFIER = "item";
     private String link;
     public static final String LINK_IDENTIFIER = "link";
@@ -19,12 +29,26 @@ public class Item implements RSSTag {
     private String pubDate;
     public static final String PUBDATE_IDENTIFIER = "pubDate";
 
+    public Item() {
+    }
+
+    @Id
+    @GeneratedValue(generator = "increment")
+    @GenericGenerator(name = "increment", strategy = "increment")
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
     public String getLink() {
         return link;
     }
 
     public void setLink(String link) {
-        this.link = link.trim();
+        this.link = link;
     }
 
     public String getAuthor() {
@@ -32,7 +56,7 @@ public class Item implements RSSTag {
     }
 
     public void setAuthor(String author) {
-        this.author = author.trim();
+        this.author = author;
     }
 
     public String getTitle() {
@@ -40,15 +64,16 @@ public class Item implements RSSTag {
     }
 
     public void setTitle(String title) {
-        this.title = title.trim();
+        this.title = title;
     }
 
+    @Column(length = 1000)
     public String getDescription() {
         return description;
     }
 
     public void setDescription(String description) {
-        this.description = description.trim();
+        this.description = description;
     }
 
     public String getPubDate() {
@@ -56,7 +81,7 @@ public class Item implements RSSTag {
     }
 
     public void setPubDate(String pubDate) {
-        this.pubDate = pubDate.trim();
+        this.pubDate = pubDate;
     }
 
     @Override

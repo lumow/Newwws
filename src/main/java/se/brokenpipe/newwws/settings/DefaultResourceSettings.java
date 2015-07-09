@@ -18,8 +18,9 @@ public class DefaultResourceSettings implements ResourceSettings {
     @Override
     public List<Resource> getAllResources() {
         List<Resource> resources = new ArrayList<>();
-        resources.add(new Resource("http://www.di.se/rss", new RssParser(), updateInterval));
-        resources.add(new Resource("http://www.svd.se/?service=rss", new RssParser(), updateInterval));
+        resources.add(new Resource("http://www.di.se/rss", new RssParser("Dagens Industri"), updateInterval));
+        resources.add(new Resource("http://www.svd.se/?service=rss", new RssParser("Svenska Dagbladet"), updateInterval));
+        resources.add(new Resource("http://bubb.la/rss/nyheter", new RssParser("Bubb.la"), updateInterval));
 
         return resources;
     }
