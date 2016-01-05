@@ -10,8 +10,10 @@
 
     <properties>
         <h2version>1.4.187</h2version>
-        <aaltoVersion>0.9.11</aaltoVersion>
         <jsonVersion>20141113</jsonVersion>
+        <guiceVersion>4.0</guiceVersion>
+        <hibernateVersion>4.3.10.Final</hibernateVersion>
+        <testngVersion>6.8.8</testngVersion>
     </properties>
 
     <dependencies>
@@ -21,6 +23,11 @@
             <version>${h2version}</version>
         </dependency>
         <dependency>
+            <groupId>org.postgresql</groupId>
+            <artifactId>postgresql</artifactId>
+            <version>9.4-1201-jdbc41</version>
+        </dependency>
+        <dependency>
             <groupId>org.json</groupId>
             <artifactId>json</artifactId>
             <version>${jsonVersion}</version>
@@ -28,17 +35,22 @@
         <dependency>
             <groupId>com.google.inject</groupId>
             <artifactId>guice</artifactId>
-            <version>4.0</version>
+            <version>${guiceVersion}</version>
         </dependency>
         <dependency>
             <groupId>org.hibernate</groupId>
             <artifactId>hibernate-core</artifactId>
-            <version>4.3.10.Final</version>
+            <version>${hibernateVersion}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.eclipse.jetty</groupId>
+            <artifactId>jetty-server</artifactId>
+            <version>9.3.6.v20151106</version>
         </dependency>
         <dependency>
             <groupId>org.testng</groupId>
             <artifactId>testng</artifactId>
-            <version>6.8.8</version>
+            <version>${testngVersion}</version>
             <scope>test</scope>
         </dependency>
     </dependencies>

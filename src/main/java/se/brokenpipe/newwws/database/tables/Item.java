@@ -3,10 +3,7 @@ package se.brokenpipe.newwws.database.tables;
 import org.hibernate.annotations.GenericGenerator;
 import se.brokenpipe.newwws.resource.parser.rss.RSSTag;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
+import javax.persistence.*;
 
 /**
  * Author: Jacob Arnesson
@@ -16,18 +13,20 @@ import javax.persistence.Id;
 @Entity
 public class Item implements RSSTag {
 
-    private Long id;
     public static final String IDENTIFIER = "item";
-    private String link;
     public static final String LINK_IDENTIFIER = "link";
-    private String author;
     public static final String AUTHOR_IDENTIFIER = "author";
-    private String title;
     public static final String TITLE_IDENTIFIER = "title";
-    private String description;
     public static final String DESCRIPTION_IDENTIFIER = "description";
-    private String pubDate;
     public static final String PUBDATE_IDENTIFIER = "pubDate";
+
+    private Long id;
+    private String link;
+    private String author;
+    private String title;
+    private String description;
+    private String pubDate;
+    private Channel channel;
 
     public Item() {
     }
@@ -84,6 +83,16 @@ public class Item implements RSSTag {
         this.pubDate = pubDate;
     }
 
+    @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+    @JoinColumn(name = "channel_id")
+    public Channel getChannelId() {
+        return channel;
+    }
+
+    public void setChannelId(Channel channel) {
+        this.channel = channel;
+    }
+
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
@@ -97,11 +106,11 @@ public class Item implements RSSTag {
 
     @Override
     public boolean isSupported(String tag) {
-        return tag.equals(LINK_IDENTIFIER) ||
-                tag.equals(AUTHOR_IDENTIFIER) ||
-                tag.equals(TITLE_IDENTIFIER) ||
-                tag.equals(DESCRIPTION_IDENTIFIER) ||
-                tag.equals(PUBDATE_IDENTIFIER);
+        return LINK_IDENTIFIER.equals(tag) ||
+                AUTHOR_IDENTIFIER.equals(tag) ||
+                TITLE_IDENTIFIER.equals(tag) ||
+                DESCRIPTION_IDENTIFIER.equals(tag) ||
+                PUBDATE_IDENTIFIER.equals(tag);
     }
 
     @Override

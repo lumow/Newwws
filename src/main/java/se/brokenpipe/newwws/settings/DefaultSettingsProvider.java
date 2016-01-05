@@ -12,7 +12,8 @@ public class DefaultSettingsProvider implements SettingsProvider {
 
     @Override
     public DatabaseSettings getDatabaseSettings() {
-        DatabaseSettings dbSettings = new DatabaseSettings("~/.newwws/db", 0, "sa", "defaultPassword", DatabaseType.H2);
+        DatabaseSettings dbSettings = new DatabaseSettings("10.20.96.18", 5432, "postgres", "admin", DatabaseType.POSTGRES);
+        //DatabaseSettings dbSettings = new DatabaseSettings("~/.newwws/db", 0, "sa", "defaultPassword", DatabaseType.H2);
         return dbSettings;
     }
 

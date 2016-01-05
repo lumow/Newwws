@@ -1,7 +1,7 @@
 package se.brokenpipe.newwws.settings;
 
 import se.brokenpipe.newwws.resource.Resource;
-import se.brokenpipe.newwws.resource.parser.rss.RssParser;
+import se.brokenpipe.newwws.resource.parser.rss.RssDomParser;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -18,9 +18,10 @@ public class DefaultResourceSettings implements ResourceSettings {
     @Override
     public List<Resource> getAllResources() {
         List<Resource> resources = new ArrayList<>();
-        resources.add(new Resource("http://www.di.se/rss", new RssParser("Dagens Industri"), updateInterval));
-        resources.add(new Resource("http://www.svd.se/?service=rss", new RssParser("Svenska Dagbladet"), updateInterval));
-        resources.add(new Resource("http://bubb.la/rss/nyheter", new RssParser("Bubb.la"), updateInterval));
+        resources.add(new Resource("http://www.di.se/rss", new RssDomParser("Dagens Industri"), updateInterval));
+        resources.add(new Resource("http://www.svd.se/?service=rss", new RssDomParser("Svenska Dagbladet"), updateInterval));
+        resources.add(new Resource("https://bubb.la/rss/nyheter", new RssDomParser("Bubb.la"), updateInterval));
+        resources.add(new Resource("https://news.ycombinator.com/rss", new RssDomParser("Hacker News"), updateInterval));
 
         return resources;
     }

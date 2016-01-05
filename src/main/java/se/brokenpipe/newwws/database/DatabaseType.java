@@ -6,7 +6,8 @@ package se.brokenpipe.newwws.database;
  * Date:   2015-07-01
  */
 public enum DatabaseType {
-    H2("org.h2.Driver", "jdbc:h2:");
+    H2("org.h2.Driver", "jdbc:h2:"),
+    POSTGRES("org.postgres.driver", "jdbc:postgres:");
 
     private final String databaseDriver;
     private final String jdbcPrefix;
