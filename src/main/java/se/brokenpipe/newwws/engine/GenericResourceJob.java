@@ -26,13 +26,20 @@ public class GenericResourceJob implements Runnable {
     @Override
     public void run() {
         LOGGER.info("Updating resource " + resource.getUrl());
+        InputStream is = null;
         try {
-            InputStream is = getInputStreamFromURL();
+            is = getInputStreamFromURL();
             resource.getParser().parse(is);
         } catch (IOException e) {
             LOGGER.warning("Couldn't read resource at [" + resource.getUrl() + "] (" + e.getMessage() + ")");
         } catch (ParseException e) {
             LOGGER.warning("Couldn't parse resource at [" + resource.getUrl() + "] (" + e.getMessage() + ")");
+        } finally {
+            try {
+                is.close();
+            } catch (IOException e) {
+                LOGGER.warning("Couldn't close data stream for [" + resource.getUrl() + "] (" + e.getMessage() + ")");
+            }
         }
     }
 

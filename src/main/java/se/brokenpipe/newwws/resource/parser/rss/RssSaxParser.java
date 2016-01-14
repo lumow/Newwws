@@ -24,7 +24,7 @@ import java.util.logging.Logger;
 public class RssSaxParser implements ResourceParser {
 
     private final String resource;
-    private final Logger LOGGER = Logger.getLogger(RssSaxParser.class.getName());
+    private static final Logger LOGGER = Logger.getLogger(RssSaxParser.class.getName());
 
     public RssSaxParser(final String resource) {
         this.resource = resource;
@@ -64,11 +64,11 @@ public class RssSaxParser implements ResourceParser {
     private void channelDatabaseTransactions(final Channel channel) {
         try {
             if (Database.channelExists(channel)) {
-                channel.setId(Database.getChannel(channel).getId());
+                channel.setId(Database.getChannelForLink(channel).getId());
             } else {
                 Database.insertChannel(channel);
             }
-            Database.clearItemsWithChannel(channel);
+            Database.deleteItemsForChannel(channel);
         } catch (DatabaseException ex) {
             LOGGER.severe("Could not insert channel [" + channel.toString() + "] cause: " + ex.getMessage());
         }

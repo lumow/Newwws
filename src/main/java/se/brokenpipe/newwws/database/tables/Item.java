@@ -83,7 +83,7 @@ public class Item implements RSSTag {
         this.pubDate = pubDate;
     }
 
-    @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+    @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "channel_id")
     public Channel getChannelId() {
         return channel;
