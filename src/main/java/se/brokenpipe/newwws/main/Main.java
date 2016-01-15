@@ -59,7 +59,8 @@ public class Main {
     }
 
     /*
-     * Checks that the string provided is a) a real existing file in the file system
+     * Checks that the string provided is:
+     * a) a real existing file in the file system
      * b) a 'normal' file, i.e. not a directory
      * c) can be read by the application
      */

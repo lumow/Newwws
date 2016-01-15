@@ -10,8 +10,10 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.time.OffsetDateTime;
+import java.time.format.TextStyle;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.logging.Logger;
 
 /**
@@ -58,9 +60,10 @@ public class SmhiJsonParser implements ResourceParser {
                 JSONObject parameter = (JSONObject) parameters.get(i);
                 if (parameter.getString("name").equals("t")) {
                     double temperature = parameter.getJSONArray("values").getDouble(0);
-                    System.out.print(OffsetDateTime.parse(validTime).toString() + ": ");
+                    OffsetDateTime dateTime = OffsetDateTime.parse(validTime);
+                    System.out.print(dateTime.toString() + " (" + dateTime.getDayOfWeek().getDisplayName(TextStyle.FULL, Locale.forLanguageTag("sv-SE")) + ")" + ": ");
                     System.out.print(temperature);
-                    System.out.println(" deg C");
+                    System.out.println("°C");
                 }
             }
         }
@@ -85,6 +88,7 @@ public class SmhiJsonParser implements ResourceParser {
         return now.getYear() == element.getYear()
                 && (now.getDayOfYear() == element.getDayOfYear()
                 || now.getDayOfYear() + 1 == element.getDayOfYear()
-                || now.getDayOfYear() + 2 == element.getDayOfYear());
+                || now.getDayOfYear() + 2 == element.getDayOfYear()
+                || now.getDayOfYear() + 3 == element.getDayOfYear());
     }
 }
