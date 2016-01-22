@@ -15,6 +15,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 /**
  * Author: Jacob Arnesson
@@ -32,19 +33,20 @@ public class SmhiJsonParser implements ResourceParser {
 
         StringBuilder jsonDocument = new StringBuilder();
         BufferedReader br = new BufferedReader(new InputStreamReader(is));
-        String line = null;
+        String line;
         try {
             while ((line = br.readLine()) != null) {
                 jsonDocument.append(line);
             }
         } catch (IOException e) {
-            e.printStackTrace();
+            LOGGER.warning("Couldn't read from stream: " + e.getMessage());
         }
         JSONObject jsonObject = new JSONObject(jsonDocument.toString());
         JSONArray timeSeries = jsonObject.getJSONArray("timeSeries");
 
-        List<JSONObject> forecast = getValidObjects(timeSeries);
-        printForecast(forecast);
+        List<JSONObject> validObjects = getValidObjects(timeSeries);
+        List<Forecast> forecasts = convertToForecast(validObjects);
+        printForecast(forecasts);
 
         long endTime = System.currentTimeMillis();
         int seconds = (int) (endTime - startTime) / 1000;
@@ -52,20 +54,30 @@ public class SmhiJsonParser implements ResourceParser {
         LOGGER.info("Parsing of resource [" + "smhi" + "] done in " + seconds + "." + milliseconds + "s");
     }
 
-    private void printForecast(List<JSONObject> forecast) {
-        for (JSONObject current : forecast) {
-            String validTime = current.getString("validTime");
-            JSONArray parameters = current.getJSONArray("parameters");
-            for (int i = 0; i < parameters.length(); i++) {
-                JSONObject parameter = (JSONObject) parameters.get(i);
-                if (parameter.getString("name").equals("t")) {
-                    double temperature = parameter.getJSONArray("values").getDouble(0);
-                    OffsetDateTime dateTime = OffsetDateTime.parse(validTime);
-                    System.out.print(dateTime.toString() + " (" + dateTime.getDayOfWeek().getDisplayName(TextStyle.FULL, Locale.forLanguageTag("sv-SE")) + ")" + ": ");
-                    System.out.print(temperature);
-                    System.out.println("°C");
+    private List<Forecast> convertToForecast(List<JSONObject> validObjects) {
+        return validObjects.stream().map(Forecast::new).collect(Collectors.toList());
+    }
+
+    private void printForecast(List<Forecast> forecasts) {
+        for (Forecast current : forecasts) {
+            OffsetDateTime dateTime = current.getValidTime();
+            System.out.println(dateTime.toString() + " (" + dateTime.getDayOfWeek().getDisplayName(TextStyle.FULL, Locale.forLanguageTag("sv-SE")) + ")");
+
+            for (Parameter parameter : current.getParameters()) {
+                ParameterType type = parameter.getType();
+                String value = parameter.getValue();
+                String unit = parameter.getUnit();
+                if (type == ParameterType.PRECIPITATION_CATEGORY) {
+                    value = PrecipitationCategory.fromKey(value).getDescription();
+                    unit = "";
+                } else if (type == ParameterType.WIND_DIRECTION) {
+                    CardinalConverter converter = new CardinalConverter(Integer.parseInt(value));
+                    value = converter.toCardinalDirection() + " (" + value + ")";
+                    unit = "";
                 }
+                System.out.println(type.getDescription() + ": " + value + "" + unit);
             }
+            System.out.println();
         }
     }
 
@@ -75,7 +87,7 @@ public class SmhiJsonParser implements ResourceParser {
         for (int i = 0; i < timeSeries.length(); i++) {
             JSONObject current = (JSONObject) timeSeries.get(i);
             OffsetDateTime currentDateTime = OffsetDateTime.parse(current.getString("validTime"));
-            if (matchesTodayPlusTwo(currentDateTime)) {
+            if (matchesTodayPlusThree(currentDateTime) && matchesInterestingTime(currentDateTime)) {
                 list.add(current);
             }
         }
@@ -83,7 +95,11 @@ public class SmhiJsonParser implements ResourceParser {
         return list;
     }
 
-    private boolean matchesTodayPlusTwo(OffsetDateTime element) {
+    private boolean matchesInterestingTime(OffsetDateTime dateTime) {
+        return dateTime.getHour() == 6 || dateTime.getHour() == 12 || dateTime.getHour() == 18;
+    }
+
+    private boolean matchesTodayPlusThree(OffsetDateTime element) {
         OffsetDateTime now = OffsetDateTime.now();
         return now.getYear() == element.getYear()
                 && (now.getDayOfYear() == element.getDayOfYear()
