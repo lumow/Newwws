@@ -10,11 +10,13 @@ public class Resource {
     private final String url;
     private final ResourceParser parser;
     private final long timer;
+    private final ResourceType type;
 
-    public Resource(String url, ResourceParser parser, long timer) {
+    public Resource(String url, ResourceParser parser, long timer, ResourceType type) {
         this.url = url;
         this.parser = parser;
         this.timer = timer;
+        this.type = type;
     }
 
     public String getUrl() {
@@ -27,5 +29,9 @@ public class Resource {
 
     public long getTimer() {
         return timer;
+    }
+
+    public ResourceType getType() {
+        return type;
     }
 }

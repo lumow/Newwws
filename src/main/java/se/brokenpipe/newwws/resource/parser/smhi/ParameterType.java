@@ -10,9 +10,10 @@ public enum ParameterType {
     TEMPERATURE("t", "Temperature"),
     WIND_DIRECTION("wd", "Wind direction"),
     WIND_SPEED("ws", "Wind speed"),
-    HUMUDITY("r", "Humidity"),
+    HUMIDITY("r", "Humidity"),
     PRECIPITATION_CATEGORY("pcat", "Precipitation category"),
-    PRECIPITATION_MEDIAN("pmedian", "Precipitation median");
+    PRECIPITATION_MEDIAN("pmedian", "Precipitation median"),
+    CLOUDY("tcc_mean", "Cloudy");
 
     private final String key;
     private final String description;

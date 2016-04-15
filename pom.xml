@@ -38,9 +38,9 @@
             <version>${hibernateVersion}</version>
         </dependency>
         <dependency>
-            <groupId>org.eclipse.jetty</groupId>
-            <artifactId>jetty-server</artifactId>
-            <version>9.3.6.v20151106</version>
+            <groupId>org.eclipse.jetty.aggregate</groupId>
+            <artifactId>jetty-all</artifactId>
+            <version>9.3.8.v20160314</version>
         </dependency>
         <dependency>
             <groupId>org.apache.myfaces.core</groupId>

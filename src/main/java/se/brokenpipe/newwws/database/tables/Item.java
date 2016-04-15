@@ -66,7 +66,7 @@ public class Item implements RSSTag {
         this.title = title;
     }
 
-    @Column(length = 1000)
+    @Column(length = 4096)
     public String getDescription() {
         return description;
     }
